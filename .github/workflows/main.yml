@@ -1,0 +1,41 @@
+name: Auto Update M3U
+
+on:
+  schedule:
+    # 定时任务：每 6 小时自动运行一次 (UTC 时间)
+    - cron: '0 */6 * * *'
+  # 允许你在 Actions 页面手动点击按钮触发运行
+  workflow_dispatch: 
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v3
+
+      - name: 配置 Python 环境
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: 安装 requests 库
+        run: pip install requests
+
+      - name: 运行核心抓取脚本
+        env:
+          KS_UID: ${{ secrets.KS_UID }}
+          KS_COOKIE: ${{ secrets.KS_COOKIE }}
+        run: python main.py
+
+      - name: 提交并推送生成的 M3U 文件
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add kuaishou_playbacks.m3u
+          # 如果文件有变化就提交，没变化就不报错跳过
+          git commit -m "Auto update m3u playbacks" -a || echo "No changes to commit"
+          git push
