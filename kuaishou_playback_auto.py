@@ -95,7 +95,7 @@ def get_all_playbacks(uid: str, user_cookie: str = ""):
                 try:
                     # 强制指定为 UTC+8 (北京时间)
                     tz_bj = datetime.timezone(datetime.timedelta(hours=8))
-                    dt = datetime.datetime.fromtimestamp(ts_ms / 1000).strftime('%Y-%m-%d %H:%M')
+                    dt = datetime.datetime.fromtimestamp(ts_ms / 1000, tz=tz_bj).strftime('%Y-%m-%d %H:%M')
                 except Exception:
                     dt = "未知时间"
 
