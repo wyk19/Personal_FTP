@@ -38,4 +38,5 @@ jobs:
           git add kuaishou_playbacks.m3u
           # 如果文件有变化就提交，没变化就不报错跳过
           git commit -m "Auto update m3u playbacks" -a || echo "No changes to commit"
+          git pull --rebase origin main
           git push
