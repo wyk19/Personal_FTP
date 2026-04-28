@@ -3,7 +3,7 @@ name: Auto Update M3U
 on:
   schedule:
     # 每天北京时间晚上 18:00 (即 UTC 10:00) 运行
-    - cron: '0 10 * * *'
+    - cron: '43 09 * * *'
   # 允许你在 Actions 页面手动点击按钮触发运行
   workflow_dispatch: 
 
