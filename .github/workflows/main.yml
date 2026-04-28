@@ -29,7 +29,7 @@ jobs:
         env:
           KS_UID: ${{ secrets.KS_UID }}
           KS_COOKIE: ${{ secrets.KS_COOKIE }}
-        run: python main.py
+        run: python kuaishou_playback_auto.py
 
       - name: 提交并推送生成的 M3U 文件
         run: |
