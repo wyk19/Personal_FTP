@@ -138,7 +138,8 @@ def export_to_m3u(results, uid, filename="kuaishou_playbacks.m3u"):
         for item in results:
             title = f"回放 {item['time']}"
             url = item['url']
-            f.write(f'#EXTINF:-1 tvg-name="{title}" group-title="快手回放_{uid}",{title}\n')
+            # f.write(f'#EXTINF:-1 tvg-name="{title}" group-title="快手回放_{uid}",{title}\n')
+            f.write(f'#EXTINF:-1 tvg-name="{title}",{title}\n')
             f.write(f"{url}\n")
     print(f"\n[+] 成功！播放列表已保存至: {os.path.abspath(filename)}")
 
