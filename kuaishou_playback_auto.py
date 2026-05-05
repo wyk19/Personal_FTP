@@ -72,6 +72,7 @@ def get_all_playbacks(uid: str, user_cookie: str = ""):
     requests.packages.urllib3.disable_warnings()
 
     results = []
+    seen_vids = set()  # 💡核心修复：用于记录已经处理过的视频ID，防重复
     page_count = 1
 
     while True:  # 直接使用死循环，依靠接口返回的游标决定何时退出
@@ -91,6 +92,13 @@ def get_all_playbacks(uid: str, user_cookie: str = ""):
 
             for obj in v_list:
                 vid = obj.get('id')
+                
+                # 💡核心修复：去重拦截逻辑
+                if vid in seen_vids:
+                    print(f"  -> [去重] 跳过重复视频: {vid}")
+                    continue
+                seen_vids.add(vid)
+
                 ts_ms = obj.get('createTime', 0)
                 try:
                     # 强制指定为 UTC+8 (北京时间)
@@ -109,7 +117,7 @@ def get_all_playbacks(uid: str, user_cookie: str = ""):
 
                 time.sleep(0.5)
 
-                # 原汁原味的终止判断条件：没有游标了就撤
+            # 原汁原味的终止判断条件：没有游标了就撤
             pcursor = inner.get('pcursor')
             if not pcursor or pcursor == "no_more":
                 print("[*] 服务器返回 no_more，已到达历史记录最末尾。")
@@ -123,12 +131,12 @@ def get_all_playbacks(uid: str, user_cookie: str = ""):
             print(f"[-] 列表请求异常: {e}")
             break
 
-    print(f"\n[*] 任务结束，共成功解析 {len(results)} 个回放视频。")
+    print(f"\n[*] 任务结束，共成功解析 {len(results)} 个无重复回放视频。")
     return results
 
 
 def export_to_m3u(results, uid, filename="kuaishou_playbacks.m3u"):
-    """导出为 APTV 可订阅的 M3U 格式"""
+    """导出为 SenPlayer 等可订阅的 M3U 格式"""
     if not results:
         print("[-] 没有数据可导出。")
         return
@@ -138,8 +146,8 @@ def export_to_m3u(results, uid, filename="kuaishou_playbacks.m3u"):
         for item in results:
             title = f"回放 {item['time']}"
             url = item['url']
-            # f.write(f'#EXTINF:-1 tvg-name="{title}" group-title="快手回放_{uid}",{title}\n')
-            f.write(f'#EXTINF:-1 tvg-name="{title}",{title}\n')
+            # f.write(f'#EXTINF:-1 vod="1" tvg-name="{title}" group-title="快手回放_{uid}",{title}\n')
+            f.write(f'#EXTINF:-1 vod="1" tvg-name="{title}",{title}\n')
             f.write(f"{url}\n")
     print(f"\n[+] 成功！播放列表已保存至: {os.path.abspath(filename)}")
 
